@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_nav">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/appIntroFragment">
 
+    <fragment
+        android:id="@+id/appIntroFragment"
+        android:name="com.sdevprem.dailyquiz.FragmentAppIntro"
+        android:label="fragment_app_intro"
+        tools:layout="@layout/fragment_app_intro" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.sdevprem.dailyquiz.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.sdevprem.dailyquiz.SignUpFragment"
+        android:label="fragment_sign_up"
+        tools:layout="@layout/fragment_sign_up" />
 </navigation>
