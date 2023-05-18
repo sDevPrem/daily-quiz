@@ -8,91 +8,103 @@
         tools:context=".ui.SignUpFragment">
 
         <LinearLayout
+            android:id="@+id/form_container"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:orientation="vertical"
+            android:background="?attr/colorSurface"
             android:gravity="center_vertical"
+            android:orientation="vertical"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
             app:layout_constraintBottom_toTopOf="@+id/bottom_img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:background="?attr/colorSurface"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorSecondary"
-                style="@style/TextAppearance.AppCompat.Title"
-                android:text="Stay Connected" />
+                android:text="Stay Connected"
+                android:textColor="?attr/colorSecondary" />
 
             <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textColor="?attr/colorOnSurface"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:text="Enter your email address and password to get access to your account." />
+                android:text="Enter your email address and password to get access to your account."
+                android:textColor="?attr/colorOnSurface" />
 
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
                 android:layout_marginTop="16dp"
-                >
+                android:hint="Email">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    />
+                    android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Password"
-                >
+                android:hint="Password">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    />
+                    android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Confirm Password"
-                >
+                android:hint="Confirm Password">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/confirm_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    />
+                    android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
+
             <Button
                 android:id="@+id/btn_signUp"
                 android:layout_width="match_parent"
-                android:layout_marginTop="24dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/btn_primary"
                 android:text="SIGN UP" />
+
             <TextView
                 android:id="@+id/btn_logIn"
+                style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="?attr/colorPrimary"
+                android:text="Already have an account? Login"
                 android:textAlignment="center"
-                android:text="Already have an account? Login" />
-
+                android:textColor="?attr/colorPrimary" />
         </LinearLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_img"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/form_container" />
 
         <ImageView
             android:id="@+id/bottom_img"

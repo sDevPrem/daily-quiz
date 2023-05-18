@@ -9,11 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.sdevprem.dailyquiz.R
-import com.sdevprem.dailyquiz.data.UserRepository
+import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.databinding.FragmentAppIntroBinding
-import com.sdevprem.dailyquiz.databinding.FragmentAppIntroBindingImpl
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
