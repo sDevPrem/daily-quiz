@@ -1,8 +1,11 @@
-package com.sdevprem.dailyquiz
+package com.sdevprem.dailyquiz.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.sdevprem.dailyquiz.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
