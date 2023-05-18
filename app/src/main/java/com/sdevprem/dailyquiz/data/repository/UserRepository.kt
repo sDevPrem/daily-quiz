@@ -1,8 +1,10 @@
 package com.sdevprem.dailyquiz.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
+import com.sdevprem.dailyquiz.data.util.exception.toLoginException
 import com.sdevprem.dailyquiz.data.util.exception.toSignupException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -43,5 +45,21 @@ class UserRepository
                 emit(result)
             }
     }.flowOn(ioDispatcher)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun login(user : User) = flow<Response<User>> {
+        firebaseAuth.signInWithEmailAndPassword(user.email,user.password)
+            .apply {
+                val result = suspendCancellableCoroutine { cont ->
+                    addOnSuccessListener{
+                        cont.resume(Response.Success(user),null)
+                    }
+                    addOnFailureListener {
+                        cont.resume(Response.Error(it.toLoginException()),null)
+                    }
+                }
+                emit(result)
+            }
+    }.flowOn(Dispatchers.IO)
 
 }
