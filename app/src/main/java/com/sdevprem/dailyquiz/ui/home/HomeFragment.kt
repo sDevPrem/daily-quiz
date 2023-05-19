@@ -18,7 +18,6 @@ import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.databinding.FragmentHomeBinding
-import com.sdevprem.dailyquiz.ui.HomeFragmentDirections
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint

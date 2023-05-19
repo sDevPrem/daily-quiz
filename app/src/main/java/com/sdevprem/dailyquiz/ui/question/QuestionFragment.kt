@@ -13,7 +13,6 @@ import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.Question
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.databinding.FragmentQuestionBinding
-import com.sdevprem.dailyquiz.ui.QuestionFragmentArgs
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint

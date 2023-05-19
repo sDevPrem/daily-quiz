@@ -17,7 +17,6 @@ import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.LoginException
 import com.sdevprem.dailyquiz.databinding.FragmentLoginBinding
-import com.sdevprem.dailyquiz.ui.LoginFragmentDirections
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint

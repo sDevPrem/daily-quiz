@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.databinding.FragmentAppIntroBinding
-import com.sdevprem.dailyquiz.ui.FragmentAppIntroDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
