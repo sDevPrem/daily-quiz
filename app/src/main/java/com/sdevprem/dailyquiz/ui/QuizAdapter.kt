@@ -11,16 +11,21 @@ import com.sdevprem.dailyquiz.uitls.ColorPicker
 import com.sdevprem.dailyquiz.uitls.IconPicker
 
 class QuizAdapter(
-    quizList : List<Quiz>
+    quizList: List<Quiz>,
+    val onItemClick: (pos: Int) -> Unit
 ) : Adapter<QuizAdapter.QuizVH>() {
 
-    var quizList : List<Quiz> = quizList
+    var quizList: List<Quiz> = quizList
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    inner class QuizVH(val binding : QuizListItemBinding) : ViewHolder(binding.root)
+    inner class QuizVH(val binding: QuizListItemBinding) : ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener { onItemClick(adapterPosition) }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizVH {
         return QuizVH(

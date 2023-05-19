@@ -29,8 +29,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(){
-    lateinit var binding : FragmentHomeBinding
-    private val adapter = QuizAdapter(emptyList())
+    lateinit var binding: FragmentHomeBinding
+    private val adapter = QuizAdapter(emptyList()) {
+        findNavController().navigate(
+            HomeFragmentDirections
+                .actionHomeFragmentToQuestionFragment()
+        )
+    }
     private val viewModel: HomeVM by viewModels()
 
     override fun onCreateView(

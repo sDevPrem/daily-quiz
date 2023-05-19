@@ -56,5 +56,14 @@
         android:id="@+id/homeFragment"
         android:name="com.sdevprem.dailyquiz.ui.HomeFragment"
         android:label="Daily Quiz"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_questionFragment"
+            app:destination="@id/questionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/questionFragment"
+        android:name="com.sdevprem.dailyquiz.ui.QuestionFragment"
+        android:label="fragment_question"
+        tools:layout="@layout/fragment_question" />
 </navigation>

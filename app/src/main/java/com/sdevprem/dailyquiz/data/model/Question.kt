@@ -7,5 +7,5 @@ data class Question(
     var opt3 : String = "",
     var opt4 : String = "",
     var answer : String = "",
-    var userAnswer : String = ""
+    var userAnswer: Int = -1 //no option selected
 )
