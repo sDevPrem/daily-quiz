@@ -5,7 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.SignUpFragment">
+        tools:context=".ui.onbaording.SignUpFragment">
 
         <LinearLayout
             android:id="@+id/form_container"

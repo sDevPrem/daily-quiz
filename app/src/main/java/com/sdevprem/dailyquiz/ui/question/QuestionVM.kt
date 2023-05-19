@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.question
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

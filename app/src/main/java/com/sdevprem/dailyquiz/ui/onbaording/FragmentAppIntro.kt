@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.onbaording
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.databinding.FragmentAppIntroBinding
+import com.sdevprem.dailyquiz.ui.FragmentAppIntroDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,8 +41,7 @@ class FragmentAppIntro : Fragment(R.layout.fragment_app_intro) {
         lifecycleScope.launch{
             if(userRepository.isUserSignIn()){
                 findNavController().navigate(
-                    FragmentAppIntroDirections
-                        .actionAppIntroFragmentToHomeFragment()
+                    FragmentAppIntroDirections.actionAppIntroFragmentToHomeFragment()
                 )
 
             }else{
@@ -50,8 +50,7 @@ class FragmentAppIntro : Fragment(R.layout.fragment_app_intro) {
                     isVisible = true
                     setOnClickListener{
                         findNavController().navigate(
-                            FragmentAppIntroDirections
-                                .actionAppIntroFragmentToLoginFragment()
+                            FragmentAppIntroDirections.actionAppIntroFragmentToLoginFragment()
                         )
                     }
                 }

@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,6 +18,7 @@ import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.databinding.FragmentHomeBinding
+import com.sdevprem.dailyquiz.ui.HomeFragmentDirections
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,8 +33,7 @@ class HomeFragment : Fragment(){
     lateinit var binding: FragmentHomeBinding
     private val adapter = QuizAdapter(emptyList()) {
         findNavController().navigate(
-            HomeFragmentDirections
-                .actionHomeFragmentToQuestionFragment(quizList[it].id)
+            HomeFragmentDirections.actionHomeFragmentToQuestionFragment(quizList[it].id)
         )
     }
     private val viewModel: HomeVM by viewModels()

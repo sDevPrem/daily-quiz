@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.onbaording
 
 import android.os.Bundle
 import android.util.Patterns.EMAIL_ADDRESS
@@ -18,6 +18,7 @@ import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.SignupException
 import com.sdevprem.dailyquiz.databinding.FragmentSignUpBinding
+import com.sdevprem.dailyquiz.ui.SignUpFragmentDirections
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,8 +59,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
         }
         binding.btnLogIn.setOnClickListener {
             findNavController().navigate(
-                SignUpFragmentDirections
-                    .actionSignUpFragmentToLoginFragment()
+                SignUpFragmentDirections.actionSignUpFragmentToLoginFragment()
             )
         }
 
@@ -74,8 +74,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
                     is Response.Error -> handleError(it.e)
                     is Response.Success -> {
                         findNavController().navigate(
-                            SignUpFragmentDirections
-                                .actionSignUpFragmentToHomeFragment()
+                            SignUpFragmentDirections.actionSignUpFragmentToHomeFragment()
                         )
                     }
                     else -> {

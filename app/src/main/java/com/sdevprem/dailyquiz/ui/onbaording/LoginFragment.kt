@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.onbaording
 
 import android.os.Bundle
 import android.util.Patterns
@@ -16,8 +16,8 @@ import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.LoginException
-import com.sdevprem.dailyquiz.data.util.exception.SignupException
 import com.sdevprem.dailyquiz.databinding.FragmentLoginBinding
+import com.sdevprem.dailyquiz.ui.LoginFragmentDirections
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,8 +53,7 @@ class LoginFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
         binding.btnSignUp.setOnClickListener {
             findNavController().navigate(
-                LoginFragmentDirections
-                    .actionLoginFragmentToSignUpFragment()
+                LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
             )
         }
         binding.btnLogin.setOnClickListener{
@@ -66,8 +65,7 @@ class LoginFragment : Fragment(){
                 when(it){
                     is Response.Success -> {
                         findNavController().navigate(
-                            LoginFragmentDirections
-                                .actionLoginFragmentToHomeFragment()
+                            LoginFragmentDirections.actionLoginFragmentToHomeFragment()
                         )
                     }
                     is Response.Loading -> {

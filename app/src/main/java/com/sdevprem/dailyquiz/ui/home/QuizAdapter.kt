@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.home
 
 import android.graphics.Color
 import android.view.LayoutInflater

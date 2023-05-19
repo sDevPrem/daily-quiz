@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/appIntroFragment"
-        android:name="com.sdevprem.dailyquiz.ui.FragmentAppIntro"
+        android:name="com.sdevprem.dailyquiz.ui.onbaording.FragmentAppIntro"
         android:label="fragment_app_intro"
         tools:layout="@layout/fragment_app_intro" >
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.sdevprem.dailyquiz.ui.LoginFragment"
+        android:name="com.sdevprem.dailyquiz.ui.onbaording.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.sdevprem.dailyquiz.ui.SignUpFragment"
+        android:name="com.sdevprem.dailyquiz.ui.onbaording.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" >
         <action
@@ -54,7 +54,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.sdevprem.dailyquiz.ui.HomeFragment"
+        android:name="com.sdevprem.dailyquiz.ui.home.HomeFragment"
         android:label="Daily Quiz"
         tools:layout="@layout/fragment_home">
         <action
@@ -63,7 +63,7 @@
     </fragment>
     <fragment
         android:id="@+id/questionFragment"
-        android:name="com.sdevprem.dailyquiz.ui.QuestionFragment"
+        android:name="com.sdevprem.dailyquiz.ui.question.QuestionFragment"
         android:label="fragment_question"
         tools:layout="@layout/fragment_question">
         <argument

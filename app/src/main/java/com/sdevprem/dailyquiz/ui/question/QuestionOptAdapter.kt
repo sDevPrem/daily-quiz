@@ -1,4 +1,4 @@
-package com.sdevprem.dailyquiz.ui
+package com.sdevprem.dailyquiz.ui.question
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
