@@ -1,7 +1,10 @@
 package com.sdevprem.dailyquiz.data.model
 
+import com.google.firebase.firestore.DocumentId
+
 data class Quiz(
-    var id : String = "",
-    var title : String = "",
+    @DocumentId
+    var id: String = "",
+    var title: String = "",
     var questions: MutableMap<String, Question> = mutableMapOf()
 )
