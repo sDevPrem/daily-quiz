@@ -33,6 +33,7 @@ class QuestionVM @Inject constructor(
                 when (it) {
                     is Response.Success -> {
                         questionList = it.data.questions.values.toList()
+                        currentQuestionIndex = 0
                         _currentQuestion.value = Response.Success(questionList[0])
                     }
                     //pass the error directly to the UI
