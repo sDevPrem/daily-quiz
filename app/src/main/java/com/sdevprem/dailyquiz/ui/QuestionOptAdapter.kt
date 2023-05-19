@@ -9,10 +9,17 @@ import com.sdevprem.dailyquiz.data.model.Question
 import com.sdevprem.dailyquiz.databinding.QuestionOptListItemBinding
 
 class QuestionOptAdapter(
-    private val question: Question
+    question: Question
 ) : Adapter<QuestionOptAdapter.OptionVH>() {
 
-    private val options = listOf(question.opt1, question.opt2, question.opt3, question.opt4)
+    var question: Question = question
+        set(value) {
+            field = value
+            options = listOf(question.opt1, question.opt2, question.opt3, question.opt4)
+            notifyDataSetChanged()
+        }
+    private var options: List<String> =
+        listOf(question.opt1, question.opt2, question.opt3, question.opt4)
 
     inner class OptionVH(val binding: QuestionOptListItemBinding) : ViewHolder(binding.root) {
         init {

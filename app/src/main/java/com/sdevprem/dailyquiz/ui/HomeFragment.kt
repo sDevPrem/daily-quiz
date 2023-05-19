@@ -33,7 +33,7 @@ class HomeFragment : Fragment(){
     private val adapter = QuizAdapter(emptyList()) {
         findNavController().navigate(
             HomeFragmentDirections
-                .actionHomeFragmentToQuestionFragment()
+                .actionHomeFragmentToQuestionFragment(quizList[it].id)
         )
     }
     private val viewModel: HomeVM by viewModels()
@@ -84,9 +84,11 @@ class HomeFragment : Fragment(){
         }
     }
 
-    private fun populateDummyData(){
-        val dummyList = buildList<Quiz>(30){
-            for(i in 1..30)
+    fun getList() = adapter.quizList
+
+    private fun populateDummyData() {
+        val dummyList = buildList<Quiz>(30) {
+            for (i in 1..30)
                 add(Quiz(title = "Quiz no: $i"))
         }
         adapter.quizList = dummyList

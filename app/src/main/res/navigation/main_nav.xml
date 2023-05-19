@@ -65,5 +65,9 @@
         android:id="@+id/questionFragment"
         android:name="com.sdevprem.dailyquiz.ui.QuestionFragment"
         android:label="fragment_question"
-        tools:layout="@layout/fragment_question" />
+        tools:layout="@layout/fragment_question">
+        <argument
+            android:name="quiz_id"
+            app:argType="string" />
+    </fragment>
 </navigation>

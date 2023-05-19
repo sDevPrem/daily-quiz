@@ -12,7 +12,7 @@ import com.sdevprem.dailyquiz.uitls.IconPicker
 
 class QuizAdapter(
     quizList: List<Quiz>,
-    val onItemClick: (pos: Int) -> Unit
+    val onItemClick: QuizAdapter.(pos: Int) -> Unit
 ) : Adapter<QuizAdapter.QuizVH>() {
 
     var quizList: List<Quiz> = quizList
