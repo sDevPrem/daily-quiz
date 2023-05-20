@@ -12,6 +12,12 @@ class QuestionOptAdapter(
     question: Question
 ) : Adapter<QuestionOptAdapter.OptionVH>() {
 
+    private var Question.userAnswerIndex: Int
+        set(value) {
+            userAnswer = value + 1
+        }
+        get() = userAnswer - 1
+
     var question: Question = question
         set(value) {
             field = value
@@ -24,10 +30,10 @@ class QuestionOptAdapter(
     inner class OptionVH(val binding: QuestionOptListItemBinding) : ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                if (question.userAnswer != adapterPosition) {
-                    if (question.userAnswer != -1)
-                        notifyItemChanged(question.userAnswer)
-                    question.userAnswer = adapterPosition
+                if (question.userAnswerIndex != adapterPosition) {
+                    if (question.userAnswerIndex >= 0)
+                        notifyItemChanged(question.userAnswerIndex)
+                    question.userAnswerIndex = adapterPosition
                     it.setBackgroundResource(R.drawable.selected_opt_item_bg)
                 }
             }
@@ -48,7 +54,7 @@ class QuestionOptAdapter(
 
     override fun onBindViewHolder(holder: OptionVH, position: Int) {
         holder.binding.option.text = options[position]
-        if (position == question.userAnswer) {
+        if (position == question.userAnswerIndex) {
             holder.binding.root.setBackgroundResource(R.drawable.selected_opt_item_bg)
         } else holder.binding.root.background = null
     }

@@ -83,7 +83,7 @@
         </fragment>
         <fragment
             android:id="@+id/quizResultFragment"
-            android:name="com.sdevprem.dailyquiz.QuizResultFragment"
+            android:name="com.sdevprem.dailyquiz.ui.quiz_result.QuizResultFragment"
             android:label="fragment_quiz_result"
             tools:layout="@layout/fragment_quiz_result" />
     </navigation>

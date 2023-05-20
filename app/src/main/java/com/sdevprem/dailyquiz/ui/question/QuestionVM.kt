@@ -17,7 +17,8 @@ import javax.inject.Inject
 class QuestionVM @Inject constructor(
     private val quizRepository: QuizRepository
 ) : ViewModel() {
-    private var questionList = emptyList<Question>()
+    var questionList = emptyList<Question>()
+        private set
     private val _currentQuestion = MutableStateFlow<Response<Question>>(Response.Loading)
     val currentQuestion: StateFlow<Response<Question>> = _currentQuestion
     private var currentQuestionIndex = 0
