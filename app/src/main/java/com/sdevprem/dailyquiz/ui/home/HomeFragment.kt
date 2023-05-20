@@ -32,7 +32,7 @@ class HomeFragment : Fragment(){
     lateinit var binding: FragmentHomeBinding
     private val adapter = QuizAdapter(emptyList()) {
         findNavController().navigate(
-            HomeFragmentDirections.actionHomeFragmentToQuestionFragment(quizList[it].id)
+            HomeFragmentDirections.actionHomeFragmentToQuestionNav(quizList[it].id)
         )
     }
     private val viewModel: HomeVM by viewModels()

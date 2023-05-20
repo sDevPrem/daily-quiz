@@ -6,7 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdevprem.dailyquiz.R
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.collectLatest
 class QuestionFragment : Fragment(R.layout.fragment_question) {
     lateinit var binding: FragmentQuestionBinding
     private val args by navArgs<QuestionFragmentArgs>()
-    private val viewModel: QuestionVM by viewModels()
+    private val viewModel: QuestionVM by hiltNavGraphViewModels(R.id.question_nav)
     private var adapter: QuestionOptAdapter? = null
 
     override fun onCreateView(
@@ -55,7 +56,10 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             }
             rightBtn.setOnClickListener {
                 if (viewModel.isTheQuestionLast())
-                    toast("Question submitted")
+                    findNavController().navigate(
+                        QuestionFragmentDirections
+                            .actionQuestionFragmentToQuizResultFragment()
+                    )
                 else viewModel.incrementQuestion()
             }
         }
