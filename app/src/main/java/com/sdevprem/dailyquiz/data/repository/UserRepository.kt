@@ -1,7 +1,7 @@
 package com.sdevprem.dailyquiz.data.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.toLoginException
@@ -51,15 +51,35 @@ class UserRepository
         firebaseAuth.signInWithEmailAndPassword(user.email,user.password)
             .apply {
                 val result = suspendCancellableCoroutine { cont ->
-                    addOnSuccessListener{
-                        cont.resume(Response.Success(user),null)
+                    addOnSuccessListener {
+                        cont.resume(Response.Success(user), null)
                     }
                     addOnFailureListener {
-                        cont.resume(Response.Error(it.toLoginException()),null)
+                        cont.resume(Response.Error(it.toLoginException()), null)
                     }
                 }
                 emit(result)
             }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun logout() = flow {
+        firebaseAuth.signOut()
+        val result = suspendCancellableCoroutine {
+            val listener = object : AuthStateListener {
+                var flag = true
+                override fun onAuthStateChanged(p0: FirebaseAuth) {
+                    firebaseAuth.removeAuthStateListener(this)
+                    if (flag)
+                        if (p0.currentUser == null)
+                            it.resume(true, null)
+                        else it.resume(false, null)
+                    flag = false
+                }
+            }
+            firebaseAuth.addAuthStateListener(listener)
+        }
+        emit(result)
+    }.flowOn(ioDispatcher)
 
 }

@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
+import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.databinding.FragmentHomeBinding
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
@@ -23,8 +25,10 @@ import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -58,6 +62,21 @@ class HomeFragment : Fragment(){
             binding.drawerLayout
         )
         binding.toolbar.setupWithNavController(findNavController(), configuration)
+        binding.drawerNavigation.setNavigationItemSelectedListener { menuItem ->
+            if (menuItem.itemId == R.id.logout) {
+                lifecycleScope.launch {
+                    viewModel.logOut()
+                        .collectLatest {
+                            if (it)
+                                findNavController().navigate(
+                                    HomeFragmentDirections.actionHomeFragmentToAppIntroFragment()
+                                )
+                            else toast("Oops! Something went wrong please try again")
+                        }
+                }
+                return@setNavigationItemSelectedListener true
+            } else return@setNavigationItemSelectedListener false
+        }
 
         binding.quizGrid.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.quizGrid.adapter = adapter
@@ -96,7 +115,8 @@ class HomeFragment : Fragment(){
 
 @HiltViewModel
 class HomeVM @Inject constructor(
-    quizRepository: QuizRepository
+    quizRepository: QuizRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     val quiz = quizRepository.getQuizList()
         .stateIn(
@@ -104,4 +124,7 @@ class HomeVM @Inject constructor(
             SharingStarted.WhileSubscribed(10_000),
             Response.Loading
         )
+
+    fun logOut() = userRepository.logout()
+        .catch { emit(false) }
 }
