@@ -1,5 +1,6 @@
 package com.sdevprem.dailyquiz.ui.question
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -86,6 +87,11 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     private fun bindViews(question: Question) = binding.apply {
         progressBar.isVisible = false
         optList.isVisible = true
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            bottomQuestionProgress.setProgress(viewModel.getCompletionPercentage(), true)
+        } else bottomQuestionProgress.progress = viewModel.getCompletionPercentage()
+
         setQuestionToAdapter(question)
         this.question.text = question.description
         setUpButtons()

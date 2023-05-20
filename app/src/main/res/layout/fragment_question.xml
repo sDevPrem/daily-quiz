@@ -6,13 +6,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         tools:context=".ui.question.QuestionFragment">
 
         <TextView
             android:id="@+id/question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             tools:text="@string/hello_blank_fragment"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             app:layout_constraintEnd_toEndOf="parent"
@@ -33,6 +33,7 @@
             android:id="@+id/opt_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
             app:layout_constraintBottom_toTopOf="@+id/left_btn"
             app:layout_constraintEnd_toEndOf="parent"
@@ -45,9 +46,11 @@
             android:id="@+id/left_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="Previous"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_question_progress"
             app:layout_constraintEnd_toStartOf="@id/right_btn"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -56,10 +59,21 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="Next"
+            app:layout_constraintBottom_toBottomOf="@+id/left_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/left_btn"
+            app:layout_constraintTop_toTopOf="@+id/left_btn" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/bottom_question_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:indicatorColor="?attr/colorTertiary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/left_btn" />
-
+            app:layout_constraintStart_toStartOf="parent"
+            tools:progress="50" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

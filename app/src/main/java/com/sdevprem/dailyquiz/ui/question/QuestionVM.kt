@@ -59,4 +59,8 @@ class QuestionVM @Inject constructor(
 
     fun isTheQuestionFirst() = currentQuestionIndex == 0
     fun isTheQuestionLast() = currentQuestionIndex == questionList.size - 1
+
+    fun getCompletionPercentage() = if (questionList.isNotEmpty())
+        ((currentQuestionIndex + 1) / questionList.size.toFloat() * 100f).toInt()
+    else 0
 }
