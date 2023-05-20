@@ -9,8 +9,7 @@ Single-Activity Architecture.
 
 [**Firebase:**](https://firebase.google.com/) As the backend for fetching quizes.
 
-[**Navigation
-Component:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
+[**Navigation Component:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
 navigating between destinations (fragments)
 
 [**ViewModel:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
@@ -23,7 +22,7 @@ injection.
 
 ## Architecture
 
-Follows Unidirectional Data Flow ([UDF](https://developer.android.com/topic/architecture)) fpr the
+Follows Unidirectional Data Flow ([UDF](https://developer.android.com/topic/architecture)) for the
 flow of data and [Single Activity Architecture](https://youtu.be/2k8x8V77CrU) for UI.
 
 ![android architecture](https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview.png)
