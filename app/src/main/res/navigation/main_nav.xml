@@ -60,6 +60,11 @@
         <action
             android:id="@+id/action_homeFragment_to_question_nav"
             app:destination="@id/question_nav" />
+        <action
+            android:id="@+id/action_homeFragment_to_appIntroFragment"
+            app:destination="@id/appIntroFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <navigation
         android:id="@+id/question_nav"
