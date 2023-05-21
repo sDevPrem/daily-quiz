@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.Timestamp
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
@@ -107,7 +108,7 @@ class HomeFragment : Fragment(){
     private fun populateDummyData() {
         val dummyList = buildList<Quiz>(30) {
             for (i in 1..30)
-                add(Quiz(title = "Quiz no: $i"))
+                add(Quiz(timestamp = Timestamp.now()))
         }
         adapter.quizList = dummyList
     }
