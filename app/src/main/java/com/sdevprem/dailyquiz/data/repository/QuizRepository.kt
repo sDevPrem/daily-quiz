@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.util.Response
+import com.sdevprem.dailyquiz.data.util.filter.QuizFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,8 +16,10 @@ class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
 
-    fun getQuizList() = callbackFlow<Response<List<Quiz>>> {
+    fun getQuizList(quizFilter: QuizFilter) = callbackFlow<Response<List<Quiz>>> {
         val response = firestore.collection("quizzes")
+            .whereLessThanOrEqualTo("timestamp", quizFilter.toDate)
+            .whereGreaterThanOrEqualTo("timestamp", quizFilter.fromDate)
             .addSnapshotListener { value, error ->
                 if (value == null || error != null) {
                     trySend(Response.Error(error))
