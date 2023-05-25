@@ -3,13 +3,21 @@
 A Quiz App made using firebase. It is based on Unidirectional Data Flow (UDF) Architecture and
 Single-Activity Architecture.
 
+## Screenshots
+
+|                                                        |                                                       |                                                     |
+|--------------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------|
+| ![welcome_screenshot](image/Screenshot_1685004298.png) | ![signup_screenshot](image/Screenshot_1685004306.png) | ![home_screenshot](image/Screenshot_1685004456.png) |
+| ![quiz_screenshot](image/Screenshot_1685004487.png)    | ![result_screenshot](image/Screenshot_1685004510.png) |                                                     |
+
 ## Built With
 
 [**Kotlin:**](https://kotlinlang.org/) As the programming language.
 
 [**Firebase:**](https://firebase.google.com/) As the backend for fetching quizes.
 
-[**Navigation Component:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
+[**Navigation
+Component:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
 navigating between destinations (fragments)
 
 [**ViewModel:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
