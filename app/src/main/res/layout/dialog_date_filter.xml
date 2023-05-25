@@ -37,11 +37,12 @@
             app:layout_constraintTop_toTopOf="@+id/year_text_layout">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/mth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:simpleItems="@array/mth_names"
                 android:hint="Month"
-                android:inputType="none" />
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

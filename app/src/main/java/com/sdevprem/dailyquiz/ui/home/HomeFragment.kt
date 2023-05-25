@@ -21,21 +21,31 @@ import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
+import com.sdevprem.dailyquiz.data.util.filter.QuizFilter
 import com.sdevprem.dailyquiz.databinding.DialogDateFilterBinding
 import com.sdevprem.dailyquiz.databinding.FragmentHomeBinding
+import com.sdevprem.dailyquiz.uitls.DateUtils
+import com.sdevprem.dailyquiz.uitls.DateUtils.getStringMth
+import com.sdevprem.dailyquiz.uitls.DateUtils.setMaximumTimeOfMth
+import com.sdevprem.dailyquiz.uitls.DateUtils.setMinimumTimeOfMth
+import com.sdevprem.dailyquiz.uitls.DateUtils.toCalendar
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(){
+class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
     private val adapter = QuizAdapter(emptyList()) {
         findNavController().navigate(
@@ -43,6 +53,12 @@ class HomeFragment : Fragment(){
         )
     }
     private val viewModel: HomeVM by viewModels()
+
+    private val dateFilterBinding by lazy {
+        DialogDateFilterBinding.inflate(
+            LayoutInflater.from(requireContext())
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -104,16 +120,32 @@ class HomeFragment : Fragment(){
             }
         }
         binding.dateFilter.setOnClickListener {
-
+            dateFilterBinding.apply {
+                year.setText(viewModel.getFilterYear().toString())
+                mth.setText(viewModel.getFilterMthString())
+                (root.parent as? ViewGroup)?.removeView(root)
+            }
             val dialog = MaterialAlertDialogBuilder(requireContext())
-                .setView(
-                    DialogDateFilterBinding.inflate(
-                        LayoutInflater.from(requireContext())
-                    ).root
-                )
+                .setView(dateFilterBinding.root)
                 .setTitle("Choose year and month")
-                .setPositiveButton("Filter", { _, _ -> })
-                .setNegativeButton("Cancel", { _, _ -> })
+                .setPositiveButton("Filter") { dialog, _ ->
+                    if (verifyDateFilter(
+                            dateFilterBinding.year.text.toString(),
+                            dateFilterBinding.mth.text.toString()
+                        )
+                    )
+                        viewModel.setDate(
+                            dateFilterBinding.year.text.toString().toInt(),
+                            DateUtils.convertStringMthToCalendarMth(
+                                dateFilterBinding.mth.text.toString(),
+                                requireContext()
+                            )
+                        )
+                    else {
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton("Cancel") { _, _ -> }
                 .create()
             dialog.show()
             dialog.apply {
@@ -123,6 +155,25 @@ class HomeFragment : Fragment(){
                     }
             }
         }
+    }
+
+    private fun verifyDateFilter(year: String, mth: String): Boolean {
+        try {
+            if (
+                year.length < 4 ||
+                !(year.toInt() >= 2000 && year.toInt() <= Calendar.getInstance().get(Calendar.YEAR))
+            ) {
+                toast("Enter valid year")
+                return false
+            } else if (DateUtils.convertStringMthToCalendarMth(mth, requireContext()) < 0) {
+                toast("Choose valid month")
+                return false
+            }
+        } catch (e: Exception) {
+            toast("Enter valid data")
+            return false
+        }
+        return true
     }
 
     fun getList() = adapter.quizList
@@ -141,13 +192,42 @@ class HomeVM @Inject constructor(
     quizRepository: QuizRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-    val quiz = quizRepository.getQuizList()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(10_000),
-            Response.Loading
-        )
+    private val quizFilter = MutableStateFlow(QuizFilter())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val quiz = quizFilter.flatMapLatest {
+        quizRepository.getQuizList(it)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(10_000),
+        Response.Loading
+    )
+
 
     fun logOut() = userRepository.logout()
         .catch { emit(false) }
+
+    fun setDate(year: Int, calendarMth: Int) {
+        val date = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, calendarMth)
+        }
+
+        //if the date is equal to the previous one
+        //then don't apply filter
+        quizFilter.value.apply {
+            toDate.toCalendar().apply {
+                if (get(Calendar.YEAR) == year && get(Calendar.MONTH) == calendarMth)
+                    return@setDate
+            }
+        }
+
+        quizFilter.value = QuizFilter(
+            fromDate = date.setMinimumTimeOfMth().time,
+            toDate = date.setMaximumTimeOfMth().time
+        )
+    }
+
+    fun getFilterMthString() = quizFilter.value.fromDate.toCalendar().getStringMth()
+    fun getFilterYear() = quizFilter.value.fromDate.toCalendar().get(Calendar.YEAR)
 }
