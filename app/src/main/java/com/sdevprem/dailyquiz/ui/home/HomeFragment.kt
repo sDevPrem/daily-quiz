@@ -14,12 +14,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Timestamp
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
+import com.sdevprem.dailyquiz.databinding.DialogDateFilterBinding
 import com.sdevprem.dailyquiz.databinding.FragmentHomeBinding
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
@@ -99,6 +101,26 @@ class HomeFragment : Fragment(){
                     is Response.Error -> toast("Something went wrong. Please try again later")
                     else -> {}
                 }
+            }
+        }
+        binding.dateFilter.setOnClickListener {
+
+            val dialog = MaterialAlertDialogBuilder(requireContext())
+                .setView(
+                    DialogDateFilterBinding.inflate(
+                        LayoutInflater.from(requireContext())
+                    ).root
+                )
+                .setTitle("Choose year and month")
+                .setPositiveButton("Filter", { _, _ -> })
+                .setNegativeButton("Cancel", { _, _ -> })
+                .create()
+            dialog.show()
+            dialog.apply {
+                (requireView().parent as ViewGroup)
+                    .apply {
+                        setPadding(requireView().paddingLeft, 0, requireView().paddingRight, 0)
+                    }
             }
         }
     }

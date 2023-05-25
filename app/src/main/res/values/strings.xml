@@ -4,4 +4,31 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="user_quiz_result_score">Your Score : %d</string>
     <string name="quiz_result_question">%1$d. %2$s</string>
+
+    <string name="mth_jan">Jan</string>
+    <string name="mth_feb">Feb</string>
+    <string name="mth_mar">Mar</string>
+    <string name="mth_apr">Apr</string>
+    <string name="mth_may">May</string>
+    <string name="mth_jun">Jun</string>
+    <string name="mth_jul">Jul</string>
+    <string name="mth_aug">Aug</string>
+    <string name="mth_sep">Sep</string>
+    <string name="mth_oct">Oct</string>
+    <string name="mth_nov">Nov</string>
+    <string name="mth_dec">Dec</string>
+    <array name="mth_names">
+        <item>@string/mth_jan</item>
+        <item>@string/mth_feb</item>
+        <item>@string/mth_mar</item>
+        <item>@string/mth_apr</item>
+        <item>@string/mth_may</item>
+        <item>@string/mth_jun</item>
+        <item>@string/mth_jul</item>
+        <item>@string/mth_aug</item>
+        <item>@string/mth_sep</item>
+        <item>@string/mth_oct</item>
+        <item>@string/mth_nov</item>
+        <item>@string/mth_dec</item>
+    </array>
 </resources>
