@@ -24,15 +24,26 @@ class QuestionVM @Inject constructor(
     var questionList = emptyList<Question>()
         private set
     private val _currentQuestion = MutableStateFlow<Response<Question>>(Response.Loading)
-    val currentQuestion: StateFlow<Response<Question>> = _currentQuestion
+    val currentQuestion: StateFlow<Response<Question>> by lazy {
+        quizId?.let { startFetchingQuiz(it) }
+        _currentQuestion
+    }
     private var currentQuestionIndex = 0
-    private var quizId: String? = null
+    var quizId: String? = null
     private var quiz: Quiz? = null
+    private val _userScore = MutableStateFlow<Response<QuizScore?>>(Response.Loading)
 
-    fun startFetchingQuiz(id: String) {
-        if (quizId != null)
-            return
-        quizId = id
+    val userScore: StateFlow<Response<QuizScore?>> by lazy {
+        quizId?.let {
+            quizRepository.getUserScore(it)
+                .onStart { emit(Response.Loading) }
+                .onEach { _userScore.value = it }
+                .launchIn(viewModelScope)
+        }
+        _userScore
+    }
+
+    private fun startFetchingQuiz(id: String) {
         quizRepository.getQuiz(id)
             .onStart { emit(Response.Loading) }
             .onEach {
@@ -79,5 +90,15 @@ class QuestionVM @Inject constructor(
             QuizScore(totalScore, quiz?.timestamp ?: return@launch),
             quizId ?: return@launch
         )
+    }
+
+    fun reset() {
+        currentQuestionIndex = 0
+        questionList.forEach {
+            it.userAnswer = -1
+        }
+        if (questionList.isNotEmpty()) {
+            _currentQuestion.value = Response.Success(questionList[currentQuestionIndex])
+        }
     }
 }
