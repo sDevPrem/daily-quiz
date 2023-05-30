@@ -1,8 +1,10 @@
 package com.sdevprem.dailyquiz.data.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.sdevprem.dailyquiz.data.model.Quiz
+import com.sdevprem.dailyquiz.data.model.QuizScore
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.filter.QuizFilter
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +15,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class QuizRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
 ) {
 
     fun getQuizList(quizFilter: QuizFilter) = callbackFlow<Response<List<Quiz>>> {
@@ -51,5 +54,11 @@ class QuizRepository @Inject constructor(
             response.remove()
         }
     }.flowOn(Dispatchers.IO)
+
+    fun saveUserScore(score: QuizScore, quizId: String) {
+        firestore.collection("users")
+            .document(firebaseAuth.currentUser?.uid ?: return)
+            .update("attemptedQuizzes", mapOf(quizId to score))
+    }
 
 }

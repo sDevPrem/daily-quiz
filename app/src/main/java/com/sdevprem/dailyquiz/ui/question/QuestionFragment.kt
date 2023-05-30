@@ -56,12 +56,13 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                 viewModel.decrementQuestion()
             }
             rightBtn.setOnClickListener {
-                if (viewModel.isTheQuestionLast())
+                if (viewModel.isTheQuestionLast()) {
+                    viewModel.saveUserScore()
                     findNavController().navigate(
                         QuestionFragmentDirections
                             .actionQuestionFragmentToQuizResultFragment()
                     )
-                else viewModel.incrementQuestion()
+                } else viewModel.incrementQuestion()
             }
         }
         viewModel.startFetchingQuiz(args.quizId)
