@@ -2,6 +2,8 @@ package com.sdevprem.dailyquiz.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.toLoginException
@@ -16,11 +18,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 class UserRepository
 @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) {
     @OptIn(DelicateCoroutinesApi::class)
     private val externalScope: CoroutineScope = GlobalScope
@@ -31,28 +35,36 @@ class UserRepository
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun signUp(user: User) = flow<Response<User>> {
-        firebaseAuth.createUserWithEmailAndPassword(user.email,user.password)
-            .apply{
+    fun signUp(authUser: AuthUser) = flow<Response<AuthUser>> {
+        firebaseAuth.createUserWithEmailAndPassword(authUser.email, authUser.password)
+            .apply {
                 val result = suspendCancellableCoroutine { cont ->
-                    addOnSuccessListener{
-                        cont.resume(Response.Success(user),null)
+                    addOnSuccessListener {
+                        cont.resume(Response.Success(authUser.apply { uid = it.user!!.uid }), null)
                     }
                     addOnFailureListener {
-                        cont.resume(Response.Error(it.toSignupException()),null)
+                        cont.resume(Response.Error(it.toSignupException()), null)
                     }
                 }
-                emit(result)
+                if (result is Response.Success) {
+                    if (createUserIfNotExist(result.data.uid!!)) emit(result)
+                    else {
+                        //if it failed to save the user in db
+                        //then also delete the user
+                        firebaseAuth.currentUser?.delete()
+                        emit(Response.Error(IOException("Unable to create user")))
+                    }
+                } else emit(result)
             }
     }.flowOn(ioDispatcher)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun login(user : User) = flow<Response<User>> {
-        firebaseAuth.signInWithEmailAndPassword(user.email,user.password)
+    fun login(authUser: AuthUser) = flow<Response<AuthUser>> {
+        firebaseAuth.signInWithEmailAndPassword(authUser.email, authUser.password)
             .apply {
                 val result = suspendCancellableCoroutine { cont ->
                     addOnSuccessListener {
-                        cont.resume(Response.Success(user), null)
+                        cont.resume(Response.Success(authUser), null)
                     }
                     addOnFailureListener {
                         cont.resume(Response.Error(it.toLoginException()), null)
@@ -81,5 +93,22 @@ class UserRepository
         }
         emit(result)
     }.flowOn(ioDispatcher)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun createUserIfNotExist(uid: String) = suspendCancellableCoroutine<Boolean> { cont ->
+        val uidRef = firestore.collection("users").document(uid)
+        uidRef.get()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    if (!it.result.exists()) {
+                        uidRef.set(
+                            User()
+                        ).addOnSuccessListener { cont.resume(true, null) }
+                            .addOnFailureListener { cont.resume(false, null) }
+                    } else cont.resume(true, null)
+
+                } else cont.resume(false, null)
+            }
+    }
 
 }
