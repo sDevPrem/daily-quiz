@@ -5,7 +5,9 @@ import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.sdevprem.dailyquiz.data.model.AuthUser
+import com.sdevprem.dailyquiz.data.model.QuizScore
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.toLoginException
@@ -115,10 +117,11 @@ class UserRepository
             }
     }
 
-    fun getUser() = callbackFlow<Response<User>> {
+    fun getUserQuizScore() = callbackFlow<Response<List<QuizScore>>> {
         var listener: ListenerRegistration? = null
         firebaseAuth.currentUser?.uid?.let {
             listener = firestore.collection("users").document(it)
+                .collection("attemptedQuizzes")
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         trySend(Response.Error(error))
@@ -127,13 +130,37 @@ class UserRepository
                         trySend(Response.Error(IOException("User not found")))
                         return@addSnapshotListener
                     }
-                    trySend(Response.Success(value.toObject<User>()!!))
+                    trySend(Response.Success(value.toObjects<QuizScore>()))
                 }
         } ?: trySend(Response.Error(IOException("User not found")))
-        
+
         awaitClose {
             listener?.remove()
         }
     }
+
+    fun saveUserScore(score: QuizScore, quizId: String) {
+        firestore.collection("users")
+            .document(firebaseAuth.currentUser?.uid ?: return)
+            .collection("attemptedQuizzes")
+            .document(quizId)
+            .set(score)
+    }
+
+    fun getUserScore(quizId: String) = callbackFlow<Response<QuizScore?>> {
+        if (firebaseAuth.currentUser == null)
+            return@callbackFlow
+        firestore.collection("users")
+            .document(firebaseAuth.currentUser!!.uid)
+            .collection("attemptedQuizzes")
+            .document(quizId)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    trySend(Response.Success(task.result.toObject<QuizScore>()))
+                } else trySend(Response.Error(task.exception?.cause))
+            }
+        awaitClose {}
+    }.flowOn(Dispatchers.IO)
 
 }

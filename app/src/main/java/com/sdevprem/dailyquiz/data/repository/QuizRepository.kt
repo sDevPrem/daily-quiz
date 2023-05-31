@@ -1,11 +1,8 @@
 package com.sdevprem.dailyquiz.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.sdevprem.dailyquiz.data.model.Quiz
-import com.sdevprem.dailyquiz.data.model.QuizScore
-import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.filter.QuizFilter
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +14,6 @@ import javax.inject.Inject
 
 class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth
 ) {
 
     fun getQuizList(quizFilter: QuizFilter) = callbackFlow<Response<List<Quiz>>> {
@@ -54,34 +50,6 @@ class QuizRepository @Inject constructor(
         awaitClose {
             response.remove()
         }
-    }.flowOn(Dispatchers.IO)
-
-    fun saveUserScore(score: QuizScore, quizId: String) {
-        firestore.collection("users")
-            .document(firebaseAuth.currentUser?.uid ?: return)
-            .update("attemptedQuizzes.$quizId", score)
-    }
-
-    fun getUserScore(quizId: String) = callbackFlow<Response<QuizScore?>> {
-        if (firebaseAuth.currentUser == null)
-            return@callbackFlow
-        firestore.collection("users")
-            .document(firebaseAuth.currentUser!!.uid)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    task.result.toObject<User>()?.attemptedQuizzes?.toList()?.let { list ->
-                        list.forEach {
-                            if (it.first == quizId) {
-                                trySend(Response.Success(it.second))
-                                return@let
-                            }
-                        }
-                        trySend(Response.Success(null))
-                    }
-                } else trySend(Response.Error(task.exception?.cause))
-            }
-        awaitClose {}
     }.flowOn(Dispatchers.IO)
 
 }

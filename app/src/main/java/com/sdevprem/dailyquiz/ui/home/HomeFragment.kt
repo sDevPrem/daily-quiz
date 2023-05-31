@@ -106,8 +106,8 @@ class HomeFragment : Fragment() {
                 when (it) {
                     is Response.Success -> binding.apply {
                         var score = 0
-                        it.data.attemptedQuizzes.forEach { quizScore ->
-                            score += quizScore.value.score
+                        it.data.forEach { quizScore ->
+                            score += quizScore.score
                         }
                         drawerNavigation.getHeaderView(0)
                             ?.findViewById<TextView>(R.id.user_total_score)
@@ -222,7 +222,7 @@ class HomeVM @Inject constructor(
         Response.Loading
     )
 
-    val user = userRepository.getUser()
+    val user = userRepository.getUserQuizScore()
         .stateIn(
             viewModelScope,
             SharingStarted.Lazily,

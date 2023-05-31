@@ -6,6 +6,7 @@ import com.sdevprem.dailyquiz.data.model.Question
 import com.sdevprem.dailyquiz.data.model.Quiz
 import com.sdevprem.dailyquiz.data.model.QuizScore
 import com.sdevprem.dailyquiz.data.repository.QuizRepository
+import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuestionVM @Inject constructor(
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     var questionList = emptyList<Question>()
         private set
@@ -35,7 +37,7 @@ class QuestionVM @Inject constructor(
 
     val userScore: StateFlow<Response<QuizScore?>> by lazy {
         quizId?.let {
-            quizRepository.getUserScore(it)
+            userRepository.getUserScore(it)
                 .onStart { emit(Response.Loading) }
                 .onEach { _userScore.value = it }
                 .launchIn(viewModelScope)
@@ -86,8 +88,8 @@ class QuestionVM @Inject constructor(
         questionList.forEach {
             totalScore += if (it.userAnswer == it.answer) 10 else 0
         }
-        quizRepository.saveUserScore(
-            QuizScore(totalScore, quiz?.timestamp ?: return@launch),
+        userRepository.saveUserScore(
+            QuizScore(score = totalScore, quizTime = quiz?.timestamp ?: return@launch),
             quizId ?: return@launch
         )
     }
