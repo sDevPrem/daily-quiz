@@ -3,6 +3,8 @@ package com.sdevprem.dailyquiz.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.ktx.toObject
 import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
@@ -14,6 +16,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -109,6 +113,27 @@ class UserRepository
 
                 } else cont.resume(false, null)
             }
+    }
+
+    fun getUser() = callbackFlow<Response<User>> {
+        var listener: ListenerRegistration? = null
+        firebaseAuth.currentUser?.uid?.let {
+            listener = firestore.collection("users").document(it)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(Response.Error(error))
+                        return@addSnapshotListener
+                    } else if (value == null) {
+                        trySend(Response.Error(IOException("User not found")))
+                        return@addSnapshotListener
+                    }
+                    trySend(Response.Success(value.toObject<User>()!!))
+                }
+        } ?: trySend(Response.Error(IOException("User not found")))
+        
+        awaitClose {
+            listener?.remove()
+        }
     }
 
 }
