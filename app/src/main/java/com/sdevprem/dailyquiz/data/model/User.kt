@@ -1,6 +1,9 @@
 package com.sdevprem.dailyquiz.data.model
 
+import com.google.firebase.firestore.DocumentId
+
+//for future use to store some more info about the user
 data class User(
-    val email : String,
-    val password : String
+    @DocumentId
+    var uid: String? = null,
 )

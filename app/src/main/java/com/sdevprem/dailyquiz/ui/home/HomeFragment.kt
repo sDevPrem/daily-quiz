@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -100,6 +101,24 @@ class HomeFragment : Fragment() {
         binding.quizGrid.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.quizGrid.adapter = adapter
 
+        launchInLifecycle {
+            viewModel.user.collectLatest {
+                when (it) {
+                    is Response.Success -> binding.apply {
+                        var score = 0
+                        it.data.forEach { quizScore ->
+                            score += quizScore.score
+                        }
+                        drawerNavigation.getHeaderView(0)
+                            ?.findViewById<TextView>(R.id.user_total_score)
+                            ?.text = getString(R.string.user_quiz_result_score, score)
+                    }
+
+                    is Response.Error -> toast("Something went wrong. Please try again later")
+                    else -> {}
+                }
+            }
+        }
         launchInLifecycle {
             viewModel.quiz.collectLatest {
                 when (it) {
@@ -202,6 +221,13 @@ class HomeVM @Inject constructor(
         SharingStarted.WhileSubscribed(10_000),
         Response.Loading
     )
+
+    val user = userRepository.getUserQuizScore()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            Response.Loading
+        )
 
 
     fun logOut() = userRepository.logout()

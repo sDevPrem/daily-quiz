@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import com.sdevprem.dailyquiz.data.model.User
+import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.LoginException
@@ -112,13 +112,13 @@ class LoginFragment : Fragment(){
 @HiltViewModel
 class LoginVM @Inject constructor(
     private val userRepository: UserRepository
-) : ViewModel(){
-    private val _loginState = MutableStateFlow<Response<User>>(Response.Idle)
-    val loginState : StateFlow<Response<User>> = _loginState
+) : ViewModel() {
+    private val _loginState = MutableStateFlow<Response<AuthUser>>(Response.Idle)
+    val loginState: StateFlow<Response<AuthUser>> = _loginState
 
-    fun login(email : String, pass : String){
+    fun login(email: String, pass: String) {
         userRepository
-            .login(User(email, pass))
+            .login(AuthUser(null, email, pass))
             .onStart {
                 emit(Response.Loading)
             }.onEach {

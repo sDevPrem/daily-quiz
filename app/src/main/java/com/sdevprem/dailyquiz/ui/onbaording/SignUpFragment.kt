@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.sdevprem.dailyquiz.R
-import com.sdevprem.dailyquiz.data.model.User
+import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.SignupException
@@ -118,13 +118,13 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
 @HiltViewModel
 class SignUpVM @Inject constructor(
     private val userRepository: UserRepository
-) : ViewModel(){
-    private val _signUpState = MutableStateFlow<Response<User>>(Response.Idle)
-    val signUpState : StateFlow<Response<User>> = _signUpState
+) : ViewModel() {
+    private val _signUpState = MutableStateFlow<Response<AuthUser>>(Response.Idle)
+    val signUpState: StateFlow<Response<AuthUser>> = _signUpState
 
-    fun registerUser(email : String, pass : String){
+    fun registerUser(email: String, pass: String) {
         userRepository
-            .signUp(User(email, pass))
+            .signUp(AuthUser(null, email, pass))
             .onStart {
                 emit(Response.Loading)
             }.onEach {

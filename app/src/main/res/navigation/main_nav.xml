@@ -85,11 +85,29 @@
                 app:destination="@id/quizResultFragment"
                 app:popUpTo="@id/questionFragment"
                 app:popUpToInclusive="true" />
+            <argument
+                android:name="isRetry"
+                app:argType="boolean"
+                android:defaultValue="false" />
         </fragment>
         <fragment
             android:id="@+id/quizResultFragment"
             android:name="com.sdevprem.dailyquiz.ui.quiz_result.QuizResultFragment"
             android:label="fragment_quiz_result"
-            tools:layout="@layout/fragment_quiz_result" />
+            tools:layout="@layout/fragment_quiz_result">
+            <argument
+                android:name="score"
+                app:argType="integer"
+                android:defaultValue="-1" />
+            <action
+                android:id="@+id/action_quizResultFragment_to_questionFragment"
+                app:destination="@id/questionFragment"
+                app:popUpTo="@id/quizResultFragment"
+                app:popUpToInclusive="true">
+                <argument
+                    android:name="isRetry"
+                    android:defaultValue="true" />
+            </action>
+        </fragment>
     </navigation>
 </navigation>

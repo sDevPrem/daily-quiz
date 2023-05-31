@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.databinding.FragmentQuizResultBinding
@@ -19,6 +21,7 @@ import kotlinx.coroutines.withContext
 class QuizResultFragment : Fragment() {
     lateinit var binding: FragmentQuizResultBinding
     private val viewModel: QuestionVM by hiltNavGraphViewModels(R.id.question_nav)
+    private val args by navArgs<QuizResultFragmentArgs>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,15 +38,25 @@ class QuizResultFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.apply {
-            userAnswerList.layoutManager = LinearLayoutManager(requireContext())
-            userAnswerList.adapter = QuizResultAdapter(viewModel.questionList)
-            homeBtn.setOnClickListener {
-                findNavController().navigateUp()
-            }
+        binding.homeBtn.setOnClickListener {
+            findNavController().navigateUp()
         }
-        lifecycleScope.launch {
-            showResult()
+        binding.retryBtn.setOnClickListener {
+            viewModel.reset()
+            findNavController().navigate(
+                QuizResultFragmentDirections
+                    .actionQuizResultFragmentToQuestionFragment(
+                        viewModel.quizId ?: return@setOnClickListener
+                    )
+            )
+        }
+        if (args.score == -1)
+            lifecycleScope.launch {
+                showResult()
+            }
+        else binding.apply {
+            userScore.text = getString(R.string.user_quiz_result_score, args.score)
+            userAnswersLabel.isVisible = false
         }
     }
 
@@ -53,6 +66,11 @@ class QuizResultFragment : Fragment() {
             totalScore += if (it.userAnswer == it.answer) 10 else 0
         }
         withContext(Dispatchers.Main) {
+            binding.apply {
+                userAnswerList.layoutManager = LinearLayoutManager(requireContext())
+                userAnswerList.adapter = QuizResultAdapter(viewModel.questionList)
+
+            }
             binding.userScore.text = getString(R.string.user_quiz_result_score, totalScore)
         }
     }

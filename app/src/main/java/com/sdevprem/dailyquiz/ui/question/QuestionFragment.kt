@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class QuestionFragment : Fragment(R.layout.fragment_question) {
@@ -26,6 +28,11 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     private val args by navArgs<QuestionFragmentArgs>()
     private val viewModel: QuestionVM by hiltNavGraphViewModels(R.id.question_nav)
     private var adapter: QuestionOptAdapter? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.quizId = args.quizId
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,22 +57,53 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             opt3 = "Fly to safety.",
             opt4 = "706-888-999",
         )
+        if (!args.isRetry)
+            lifecycleScope.launch {
+                viewModel.userScore.collectLatest {
+                    when (it) {
+                        is Response.Success -> {
+                            if (it.data == null) {
+                                fetchQuiz()
+                            } else {
+                                findNavController().navigate(
+                                    QuestionFragmentDirections
+                                        .actionQuestionFragmentToQuizResultFragment(score = it.data.score)
+                                )
+                            }
+                        }
+
+                        is Response.Loading -> binding.apply {
+                            leftBtn.visibility = View.INVISIBLE
+                            rightBtn.isEnabled = false
+                            optList.isVisible = false
+                            progressBar.isVisible = true
+                        }
+
+                        is Response.Error -> toast(it.e?.message ?: "")
+                        else -> {}
+                    }
+                }
+            }
+        else fetchQuiz()
+
+    }
+
+    private fun fetchQuiz() {
         binding.apply {
             optList.layoutManager = LinearLayoutManager(requireContext())
             leftBtn.setOnClickListener {
                 viewModel.decrementQuestion()
             }
             rightBtn.setOnClickListener {
-                if (viewModel.isTheQuestionLast())
+                if (viewModel.isTheQuestionLast()) {
+                    viewModel.saveUserScore()
                     findNavController().navigate(
                         QuestionFragmentDirections
                             .actionQuestionFragmentToQuizResultFragment()
                     )
-                else viewModel.incrementQuestion()
+                } else viewModel.incrementQuestion()
             }
         }
-        viewModel.startFetchingQuiz(args.quizId)
-
         launchInLifecycle {
             viewModel.currentQuestion.collectLatest {
                 when (it) {

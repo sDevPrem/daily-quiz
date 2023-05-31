@@ -13,7 +13,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class QuizRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
 ) {
 
     fun getQuizList(quizFilter: QuizFilter) = callbackFlow<Response<List<Quiz>>> {
