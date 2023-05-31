@@ -59,7 +59,7 @@ class QuizRepository @Inject constructor(
     fun saveUserScore(score: QuizScore, quizId: String) {
         firestore.collection("users")
             .document(firebaseAuth.currentUser?.uid ?: return)
-            .update("attemptedQuizzes", mapOf(quizId to score))
+            .update("attemptedQuizzes.$quizId", score)
     }
 
     fun getUserScore(quizId: String) = callbackFlow<Response<QuizScore?>> {
