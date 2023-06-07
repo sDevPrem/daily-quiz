@@ -11,8 +11,8 @@
         android:label="fragment_app_intro"
         tools:layout="@layout/fragment_app_intro" >
         <action
-            android:id="@+id/action_appIntroFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
+            android:id="@+id/action_appIntroFragment_to_auth_nav"
+            app:destination="@id/auth_nav"
             app:launchSingleTop="true" />
         <action
             android:id="@+id/action_appIntroFragment_to_homeFragment"
@@ -20,38 +20,38 @@
             app:popUpTo="@id/appIntroFragment"
             app:popUpToInclusive="true" />
     </fragment>
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.sdevprem.dailyquiz.ui.onbaording.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+
+    <navigation
+        android:id="@+id/auth_nav"
+        app:startDestination="@id/loginFragment">
+        <fragment
+            android:id="@+id/loginFragment"
+            android:name="com.sdevprem.dailyquiz.ui.onbaording.LoginFragment"
+            android:label="fragment_login"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/action_loginFragment_to_signUpFragment"
+                app:destination="@id/signUpFragment"
+                app:launchSingleTop="true"
+                app:popUpTo="@id/appIntroFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/signUpFragment"
+            android:name="com.sdevprem.dailyquiz.ui.onbaording.SignUpFragment"
+            android:label="fragment_sign_up"
+            tools:layout="@layout/fragment_sign_up">
+            <action
+                android:id="@+id/action_signUpFragment_to_loginFragment"
+                app:destination="@id/loginFragment"
+                app:launchSingleTop="true"
+                app:popUpTo="@id/appIntroFragment" />
+        </fragment>
         <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
+            android:id="@+id/action_auth_nav_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/appIntroFragment"
             app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_loginFragment_to_signUpFragment"
-            app:destination="@id/signUpFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/appIntroFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/signUpFragment"
-        android:name="com.sdevprem.dailyquiz.ui.onbaording.SignUpFragment"
-        android:label="fragment_sign_up"
-        tools:layout="@layout/fragment_sign_up" >
-        <action
-            android:id="@+id/action_signUpFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/appIntroFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_signUpFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/appIntroFragment" />
-    </fragment>
+    </navigation>
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.sdevprem.dailyquiz.ui.home.HomeFragment"

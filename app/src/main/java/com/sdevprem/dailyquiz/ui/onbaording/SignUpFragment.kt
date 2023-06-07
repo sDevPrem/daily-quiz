@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.sdevprem.dailyquiz.AuthNavDirections
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
@@ -73,7 +74,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
                     is Response.Error -> handleError(it.e)
                     is Response.Success -> {
                         findNavController().navigate(
-                            SignUpFragmentDirections.actionSignUpFragmentToHomeFragment()
+                            AuthNavDirections.actionAuthNavToHomeFragment()
                         )
                     }
                     else -> {

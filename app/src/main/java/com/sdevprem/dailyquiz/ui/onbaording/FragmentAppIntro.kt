@@ -42,14 +42,13 @@ class FragmentAppIntro : Fragment(R.layout.fragment_app_intro) {
                 findNavController().navigate(
                     FragmentAppIntroDirections.actionAppIntroFragmentToHomeFragment()
                 )
-
             }else{
                 binding.progressBar.isVisible = false
                 binding.btnGetStarted.apply {
                     isVisible = true
                     setOnClickListener{
                         findNavController().navigate(
-                            FragmentAppIntroDirections.actionAppIntroFragmentToLoginFragment()
+                            FragmentAppIntroDirections.actionAppIntroFragmentToAuthNav()
                         )
                     }
                 }
