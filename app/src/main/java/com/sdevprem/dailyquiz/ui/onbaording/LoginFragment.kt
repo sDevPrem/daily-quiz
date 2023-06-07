@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.sdevprem.dailyquiz.AuthNavDirections
 import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
@@ -64,7 +65,7 @@ class LoginFragment : Fragment(){
                 when(it){
                     is Response.Success -> {
                         findNavController().navigate(
-                            LoginFragmentDirections.actionLoginFragmentToHomeFragment()
+                            AuthNavDirections.actionAuthNavToHomeFragment()
                         )
                     }
                     is Response.Loading -> {
