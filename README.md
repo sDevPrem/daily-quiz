@@ -14,7 +14,9 @@ Single-Activity Architecture.
 
 [**Kotlin:**](https://kotlinlang.org/) As the programming language.
 
-[**Firebase:**](https://firebase.google.com/) As the backend for fetching quizes.
+[**Firebase: Cloud Firestore:**](https://firebase.google.com/docs/firestore) As the backend for fetching quizes.  
+
+[**Firebase Auth:**](https://firebase.google.com/docs/auth) For authenticating users.  
 
 [**Navigation
 Component:**](https://developer.android.com/guide/navigation/navigation-getting-started) For
@@ -26,7 +28,7 @@ cashing data and persists it through configuration changes.
 [**Hilt:**](https://developer.android.com/training/dependency-injection/hilt-android) For dependency
 injection.
 
-[**Flow:**](https://developer.android.com/kotlin/flow) For flow of data from data layer to UI layer.
+[**Kotlin Flow:**](https://developer.android.com/kotlin/flow) For flow of data from data layer to UI layer.
 
 ## Architecture
 
