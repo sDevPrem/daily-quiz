@@ -1,5 +1,6 @@
 package com.sdevprem.dailyquiz.ui.onbaording
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Patterns
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sdevprem.dailyquiz.AuthNavDirections
 import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
@@ -27,7 +29,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -80,12 +81,13 @@ class LoginFragment : Fragment(){
         }
     }
 
-    private fun handleError(e : Throwable?){
+    private fun handleError(e : Throwable?) {
         binding.btnLogin.isEnabled = true
         binding.btnSignUp.isEnabled = true
         binding.progressBar.isVisible = false
-        when(e){
-            is LoginException.InvalidCredentialException -> toast(e.message.toString())
+        when (e) {
+            is LoginException.EmailNotVerifiedException -> showEmailVerificationDialog()
+            is LoginException -> toast(e.message.toString())
             else -> toast("Something went wrong. Please try again.")
         }
     }
@@ -108,6 +110,19 @@ class LoginFragment : Fragment(){
             )
         }
     }
+
+    private fun showEmailVerificationDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Email Verification Needed")
+            .setMessage("A link was send to your email previously. Please verify to log in.")
+            .setPositiveButton("Verify Now") { _: DialogInterface?, _: Int ->
+                val intent =
+                    requireContext().packageManager.getLaunchIntentForPackage("com.google.android.gm")
+                startActivity(intent)
+                toast("Check in Spam Folder if not found")
+            }.show()
+    }
+
 }
 
 @HiltViewModel
@@ -120,9 +135,7 @@ class LoginVM @Inject constructor(
     fun login(email: String, pass: String) {
         userRepository
             .login(AuthUser(null, email, pass))
-            .onStart {
-                emit(Response.Loading)
-            }.onEach {
+            .onEach {
                 _loginState.value = it
             }.launchIn(viewModelScope)
     }

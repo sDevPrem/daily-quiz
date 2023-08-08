@@ -6,6 +6,8 @@ import java.io.IOException
 
 sealed class LoginException(message : String) : IOException(message){
     object InvalidCredentialException : LoginException("The given email or password is invalid.")
+    object EmailNotVerifiedException :
+        LoginException("Email is not verified. Verify email and try again.")
 }
 
 fun Exception.toLoginException() = when(this){

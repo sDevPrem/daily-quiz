@@ -6,9 +6,13 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import java.io.IOException
 
 sealed class SignupException(message : String) : IOException(message){
-    object EmailAlreadyInUseException : SignupException("The email address is already in use by another account")
-    object WeakPasswordException : SignupException("The given password is weak. Use string password.")
-    object InvalidCredentialException : SignupException("Invalid credentials")
+    object EmailAlreadyInUseException :
+        SignupException("The email address is already in use by another account")
+
+    object WeakPasswordException :
+        SignupException("The given password is weak. Use string password.")
+
+    object InvalidCredentialException : SignupException("Enter valid data.")
 }
 
 fun Exception.toSignupException() = when(this) {
