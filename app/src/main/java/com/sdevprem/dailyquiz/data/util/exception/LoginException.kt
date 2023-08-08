@@ -5,7 +5,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import java.io.IOException
 
 sealed class LoginException(message : String) : IOException(message){
-    object InvalidCredentialException : SignupException("The given email or password is invalid.")
+    object InvalidCredentialException : LoginException("The given email or password is invalid.")
 }
 
 fun Exception.toLoginException() = when(this){
