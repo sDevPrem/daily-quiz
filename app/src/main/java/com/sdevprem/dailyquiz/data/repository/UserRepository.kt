@@ -2,6 +2,7 @@ package com.sdevprem.dailyquiz.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
@@ -42,10 +43,14 @@ class UserRepository
     }
 
     fun signUp(authUser: AuthUser) = flow<Response<AuthUser>> {
-        val result =
-            firebaseAuth.createUserWithEmailAndPassword(authUser.email, authUser.password).await()
-        sendVerificationEmail()
-        emit(Response.Success(authUser.copy(uid = result.user!!.uid)))
+        firebaseAuth.createUserWithEmailAndPassword(
+            authUser.email, authUser.password
+        ).await().user?.let { user ->
+
+            sendVerificationEmail(user)
+            emit(Response.Success(authUser.copy(uid = user.uid)))
+
+        } ?: throw IOException("Unable to signUp")
     }.catch {
         emit(
             Response.Error(
@@ -57,8 +62,8 @@ class UserRepository
     }.flowOn(ioDispatcher)
         .onStart { emit(Response.Loading) }
 
-    private suspend fun sendVerificationEmail() {
-        firebaseAuth.currentUser?.sendEmailVerification()?.await()
+    private suspend fun sendVerificationEmail(user: FirebaseUser) {
+        user.sendEmailVerification().await()
     }
 
     fun login(authUser: AuthUser) = flow<Response<AuthUser>> {
@@ -67,7 +72,7 @@ class UserRepository
         ).await().user?.let {
 
             if (it.isEmailVerified.not()) {
-                it.sendEmailVerification()
+                sendVerificationEmail(it)
                 throw LoginException.EmailNotVerifiedException
             } else {
                 val user = createUserIfNotExist(it.uid)
