@@ -10,19 +10,21 @@ import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.model.QuizScore
 import com.sdevprem.dailyquiz.data.model.User
 import com.sdevprem.dailyquiz.data.util.Response
+import com.sdevprem.dailyquiz.data.util.exception.LoginException
 import com.sdevprem.dailyquiz.data.util.exception.toLoginException
 import com.sdevprem.dailyquiz.data.util.exception.toSignupException
+import com.sdevprem.dailyquiz.data.util.toResponse
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
@@ -32,53 +34,62 @@ class UserRepository
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) {
-    @OptIn(DelicateCoroutinesApi::class)
-    private val externalScope: CoroutineScope = GlobalScope
+
     private val ioDispatcher : CoroutineDispatcher = Dispatchers.IO
 
     suspend fun isUserSignIn() = withContext(ioDispatcher){
-        firebaseAuth.currentUser != null
+        firebaseAuth.currentUser?.isEmailVerified == true
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun signUp(authUser: AuthUser) = flow<Response<AuthUser>> {
-        firebaseAuth.createUserWithEmailAndPassword(authUser.email, authUser.password)
-            .apply {
-                val result = suspendCancellableCoroutine { cont ->
-                    addOnSuccessListener {
-                        cont.resume(Response.Success(authUser.apply { uid = it.user!!.uid }), null)
-                    }
-                    addOnFailureListener {
-                        cont.resume(Response.Error(it.toSignupException()), null)
-                    }
-                }
-                if (result is Response.Success) {
-                    if (createUserIfNotExist(result.data.uid!!)) emit(result)
-                    else {
-                        //if it failed to save the user in db
-                        //then also delete the user
-                        firebaseAuth.currentUser?.delete()
-                        emit(Response.Error(IOException("Unable to create user")))
-                    }
-                } else emit(result)
-            }
+        val result =
+            firebaseAuth.createUserWithEmailAndPassword(authUser.email, authUser.password).await()
+        sendVerificationEmail()
+        emit(Response.Success(authUser.copy(uid = result.user!!.uid)))
+    }.catch {
+        emit(
+            Response.Error(
+                if (it is Exception)
+                    it.toSignupException()
+                else it
+            )
+        )
     }.flowOn(ioDispatcher)
+        .onStart { emit(Response.Loading) }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun sendVerificationEmail() {
+        firebaseAuth.currentUser?.sendEmailVerification()?.await()
+    }
+
     fun login(authUser: AuthUser) = flow<Response<AuthUser>> {
-        firebaseAuth.signInWithEmailAndPassword(authUser.email, authUser.password)
-            .apply {
-                val result = suspendCancellableCoroutine { cont ->
-                    addOnSuccessListener {
-                        cont.resume(Response.Success(authUser), null)
-                    }
-                    addOnFailureListener {
-                        cont.resume(Response.Error(it.toLoginException()), null)
-                    }
-                }
-                emit(result)
+        firebaseAuth.signInWithEmailAndPassword(
+            authUser.email, authUser.password
+        ).await().user?.let {
+
+            if (it.isEmailVerified.not()) {
+                it.sendEmailVerification()
+                throw LoginException.EmailNotVerifiedException
+            } else {
+                val user = createUserIfNotExist(it.uid)
+                emit(Response.Success(authUser.copy(uid = user.uid)))
             }
+
+        } ?: throw IOException("Unable to login")
+    }.catch {
+        //if something goes wrong
+        //signOut user
+        firebaseAuth.signOut()
+        emit(
+            Response.Error(
+                if (it is Exception && it !is LoginException)
+                    it.toLoginException()
+                else it
+            )
+        )
+
     }.flowOn(ioDispatcher)
+        .onStart { emit(Response.Loading) }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun logout() = flow {
@@ -101,19 +112,17 @@ class UserRepository
     }.flowOn(ioDispatcher)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun createUserIfNotExist(uid: String) = suspendCancellableCoroutine<Boolean> { cont ->
-        val uidRef = firestore.collection("users").document(uid)
-        uidRef.get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    if (!it.result.exists()) {
-                        uidRef.set(
-                            User()
-                        ).addOnSuccessListener { cont.resume(true, null) }
-                            .addOnFailureListener { cont.resume(false, null) }
-                    } else cont.resume(true, null)
+    suspend fun createUserIfNotExist(uid: String): User {
+        val userRef = firestore.collection("users").document(uid)
+        val document = userRef.get().await()
 
-                } else cont.resume(false, null)
+        //if user exist then return the db user
+        //else create new user and return it
+        return document.toObject<User>()
+            ?: run {
+                val newUser = User(uid)
+                userRef.set(newUser).await()
+                return@run newUser
             }
     }
 
@@ -137,6 +146,15 @@ class UserRepository
         awaitClose {
             listener?.remove()
         }
+    }
+
+    fun sendResetPasswordEmail(email: String) = flow {
+        firebaseAuth.sendPasswordResetEmail(email).await()
+        emit(Unit)
+    }.flowOn(ioDispatcher).toResponse {
+        if (it is Exception)
+            it.toLoginException()
+        else it
     }
 
     fun saveUserScore(score: QuizScore, quizId: String) {

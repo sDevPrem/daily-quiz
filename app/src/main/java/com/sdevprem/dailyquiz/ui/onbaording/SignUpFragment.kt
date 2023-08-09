@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import com.sdevprem.dailyquiz.AuthNavDirections
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sdevprem.dailyquiz.R
 import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -73,9 +72,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
                     }
                     is Response.Error -> handleError(it.e)
                     is Response.Success -> {
-                        findNavController().navigate(
-                            AuthNavDirections.actionAuthNavToHomeFragment()
-                        )
+                        showEmailVerificationDialog()
                     }
                     else -> {
                         binding.progressBar.isVisible = false
@@ -91,21 +88,19 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
         binding.btnSignUp.isEnabled = true
         binding.progressBar.isVisible = false
         when(e){
-            is SignupException.EmailAlreadyInUseException -> toast("The email is already in use. Please use another email.")
-            is SignupException.WeakPasswordException -> toast("Invalid Password. Please use different password.")
-            is SignupException.InvalidCredentialException -> toast("Enter valid data.")
+            is SignupException -> toast(e.message.toString())
             else -> toast("Something went wrong. Please try again.")
         }
     }
 
     private fun registerUser(){
-        if(
+        if (
             binding.email.text.isNullOrBlank() ||
             !EMAIL_ADDRESS.matcher(binding.email.text.toString()).matches() ||
             binding.password.text.isNullOrBlank() ||
             binding.confirmPassword.text.isNullOrBlank() ||
             binding.password.text.toString() != binding.confirmPassword.text.toString()
-        ){
+        ) {
             Toast.makeText(requireContext(), "Enter valid data", Toast.LENGTH_SHORT).show()
             return
         }
@@ -113,6 +108,25 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up){
             binding.email.text.toString(),
             binding.confirmPassword.text.toString()
         )
+    }
+
+    private fun showEmailVerificationDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Verify your Email")
+            .setMessage("A link has been sent to your email. Please verify and log in again.")
+            .setNeutralButton("Later") { _, _ ->
+                findNavController().navigate(
+                    SignUpFragmentDirections.actionSignUpFragmentToLoginFragment()
+                )
+            }
+            .setPositiveButton("Verify Now") { _, _ ->
+                val intent =
+                    requireContext().packageManager.getLaunchIntentForPackage("com.google.android.gm")
+                startActivity(intent)
+                toast("Check in Spam Folder if not found")
+            }
+            .show()
+        Toast.makeText(requireContext(), "Account Created.", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -126,9 +140,7 @@ class SignUpVM @Inject constructor(
     fun registerUser(email: String, pass: String) {
         userRepository
             .signUp(AuthUser(null, email, pass))
-            .onStart {
-                emit(Response.Loading)
-            }.onEach {
+            .onEach {
                 _signUpState.value = it
             }.launchIn(viewModelScope)
     }

@@ -83,6 +83,16 @@
                 android:textAlignment="center"
                 android:text="Don't have an account? Signup" />
 
+            <TextView
+                android:id="@+id/btn_forgotPass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="?attr/colorPrimary"
+                android:textAlignment="center"
+                android:text="Forgot Password" />
+
         </LinearLayout>
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_bar"
