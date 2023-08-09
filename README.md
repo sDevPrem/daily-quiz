@@ -3,6 +3,19 @@
 A Quiz App made using firebase. It is based on Unidirectional Data Flow (UDF) Architecture and
 Single-Activity Architecture.
 
+## Features
+
+1. Login/Signup authentication using email-password.
+2. Email verification.
+3. Forgot password feature.
+4. User authentication in a clean architecture.
+5. Uses Firebase Coroutine extension.
+6. Attempt MCQs quiz and increase your score.
+7. Retry quiz if you didn't do well.
+8. Filter quiz according to month and year. (Note : Please choose month May, 2023 to get quiz
+   because no quiz is published
+   in other month in the firestore db with which it is connected)
+
 ## Screenshots
 
 |                                                        |                                                       |                                                     |
