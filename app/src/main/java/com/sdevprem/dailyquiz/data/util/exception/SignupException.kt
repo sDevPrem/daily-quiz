@@ -19,6 +19,6 @@ fun Exception.toSignupException() = when(this) {
         is FirebaseAuthUserCollisionException -> SignupException.EmailAlreadyInUseException
         is FirebaseAuthWeakPasswordException -> SignupException.WeakPasswordException
         is FirebaseAuthInvalidCredentialsException -> SignupException.InvalidCredentialException
-        else -> IOException(message)
+    else -> this
 }
 

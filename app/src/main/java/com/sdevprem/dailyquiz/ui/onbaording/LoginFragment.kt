@@ -19,6 +19,7 @@ import com.sdevprem.dailyquiz.data.model.AuthUser
 import com.sdevprem.dailyquiz.data.repository.UserRepository
 import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.LoginException
+import com.sdevprem.dailyquiz.data.util.exchangeResponse
 import com.sdevprem.dailyquiz.databinding.FragmentLoginBinding
 import com.sdevprem.dailyquiz.uitls.launchInLifecycle
 import com.sdevprem.dailyquiz.uitls.toast
@@ -57,23 +58,24 @@ class LoginFragment : Fragment(){
                 LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
             )
         }
-        binding.btnLogin.setOnClickListener{
-            logIn()
+        binding.btnLogin.setOnClickListener { logIn() }
+
+        binding.btnForgotPass.setOnClickListener {
+            if (binding.email.text.toString().isEmail())
+                viewModel.requestPasswordReset(binding.email.text.toString())
+            else toast("Enter valid email")
         }
 
         launchInLifecycle {
             viewModel.loginState.collectLatest {
-                when(it){
-                    is Response.Success -> {
-                        findNavController().navigate(
-                            AuthNavDirections.actionAuthNavToHomeFragment()
-                        )
-                    }
+                when (it) {
+                    is Response.Success -> handleSuccessResponse(it.data)
                     is Response.Loading -> {
                         binding.btnSignUp.isEnabled = false
                         binding.btnLogin.isEnabled = false
                         binding.progressBar.isVisible = true
                     }
+
                     is Response.Error -> handleError(it.e)
                     else -> {}
                 }
@@ -81,7 +83,19 @@ class LoginFragment : Fragment(){
         }
     }
 
-    private fun handleError(e : Throwable?) {
+    private fun handleSuccessResponse(data: LoginScreenRequest) = when (data) {
+        is LoginScreenRequest.PasswordResetRequest -> {
+            binding.progressBar.isVisible = false
+            binding.btnLogin.isEnabled = true
+            showPasswordResetEmailSuccessSentDialog()
+        }
+
+        is LoginScreenRequest.LoginRequest -> findNavController().navigate(
+            AuthNavDirections.actionAuthNavToHomeFragment()
+        )
+    }
+
+    private fun handleError(e: Throwable?) {
         binding.btnLogin.isEnabled = true
         binding.btnSignUp.isEnabled = true
         binding.progressBar.isVisible = false
@@ -95,8 +109,7 @@ class LoginFragment : Fragment(){
 
     private fun logIn(){
         if(
-            binding.email.text.isNullOrBlank() ||
-            !Patterns.EMAIL_ADDRESS.matcher(binding.email.text.toString()).matches() ||
+            binding.email.text.toString().isEmail().not() ||
             binding.password.text.isNullOrBlank()
         ){
             Toast.makeText(requireContext(), "Enter valid data", Toast.LENGTH_SHORT).show()
@@ -123,20 +136,56 @@ class LoginFragment : Fragment(){
             }.show()
     }
 
+    private fun showPasswordResetEmailSuccessSentDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Password reset email sent")
+            .setMessage("An email is sent by using which you can reset your password. Please check your inbox.")
+            .setPositiveButton("Check now") { _, _ ->
+                val intent =
+                    requireContext().packageManager.getLaunchIntentForPackage("com.google.android.gm")
+                startActivity(intent)
+                toast("Check in Spam Folder if not found")
+            }
+            .setNegativeButton("Later") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun String.isEmail() = isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
 }
 
 @HiltViewModel
 class LoginVM @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _loginState = MutableStateFlow<Response<AuthUser>>(Response.Idle)
-    val loginState: StateFlow<Response<AuthUser>> = _loginState
+    private val _loginState = MutableStateFlow<Response<LoginScreenRequest>>(Response.Idle)
+    val loginState: StateFlow<Response<LoginScreenRequest>> = _loginState
 
     fun login(email: String, pass: String) {
         userRepository
             .login(AuthUser(null, email, pass))
-            .onEach {
-                _loginState.value = it
+            .onEach { response ->
+                _loginState.value = response.exchangeResponse {
+                    LoginScreenRequest.LoginRequest(it)
+                }
             }.launchIn(viewModelScope)
     }
+
+    fun requestPasswordReset(email: String) {
+        userRepository
+            .sendResetPasswordEmail(email)
+            .onEach { response ->
+                _loginState.value = response.exchangeResponse {
+                    LoginScreenRequest.PasswordResetRequest
+                }
+            }.launchIn(viewModelScope)
+    }
+}
+
+sealed interface LoginScreenRequest {
+    object PasswordResetRequest : LoginScreenRequest
+
+    class LoginRequest(val user: AuthUser) : LoginScreenRequest
 }

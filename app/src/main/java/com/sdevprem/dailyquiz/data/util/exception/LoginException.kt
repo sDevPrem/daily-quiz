@@ -13,5 +13,5 @@ sealed class LoginException(message : String) : IOException(message){
 fun Exception.toLoginException() = when(this){
     is FirebaseAuthInvalidCredentialsException -> LoginException.InvalidCredentialException
     is FirebaseAuthInvalidUserException -> LoginException.InvalidCredentialException
-    else -> IOException(message)
+    else -> this
 }

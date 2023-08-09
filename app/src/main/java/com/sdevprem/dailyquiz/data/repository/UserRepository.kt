@@ -13,6 +13,7 @@ import com.sdevprem.dailyquiz.data.util.Response
 import com.sdevprem.dailyquiz.data.util.exception.LoginException
 import com.sdevprem.dailyquiz.data.util.exception.toLoginException
 import com.sdevprem.dailyquiz.data.util.exception.toSignupException
+import com.sdevprem.dailyquiz.data.util.toResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -146,6 +147,15 @@ class UserRepository
         awaitClose {
             listener?.remove()
         }
+    }
+
+    fun sendResetPasswordEmail(email: String) = flow {
+        firebaseAuth.sendPasswordResetEmail(email).await()
+        emit(Unit)
+    }.flowOn(ioDispatcher).toResponse {
+        if (it is Exception)
+            it.toLoginException()
+        else it
     }
 
     fun saveUserScore(score: QuizScore, quizId: String) {
