@@ -62,22 +62,23 @@ class UserRepository
     }
 
     fun login(authUser: AuthUser) = flow<Response<AuthUser>> {
-        firebaseAuth.signInWithEmailAndPassword(authUser.email, authUser.password)
-            .await().user?.let {
-                if (!it.isEmailVerified) {
-                    it.sendEmailVerification()
-                    throw LoginException.EmailNotVerifiedException
-                } else {
-                    val isUserCreated = createUserIfNotExist(it.uid)
-                    if (isUserCreated)
-                        emit(Response.Success(authUser.copy(uid = it.uid)))
-                    else {
-                        firebaseAuth.signOut()
-                        throw IOException("Unable to create user")
-                    }
-                }
+        firebaseAuth.signInWithEmailAndPassword(
+            authUser.email, authUser.password
+        ).await().user?.let {
+
+            if (it.isEmailVerified.not()) {
+                it.sendEmailVerification()
+                throw LoginException.EmailNotVerifiedException
+            } else {
+                val user = createUserIfNotExist(it.uid)
+                emit(Response.Success(authUser.copy(uid = user.uid)))
             }
+
+        } ?: throw IOException("Unable to login")
     }.catch {
+        //if something goes wrong
+        //signOut user
+        firebaseAuth.signOut()
         emit(
             Response.Error(
                 if (it is Exception && it !is LoginException)
@@ -111,19 +112,17 @@ class UserRepository
     }.flowOn(ioDispatcher)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun createUserIfNotExist(uid: String) = suspendCancellableCoroutine<Boolean> { cont ->
-        val uidRef = firestore.collection("users").document(uid)
-        uidRef.get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    if (!it.result.exists()) {
-                        uidRef.set(
-                            User()
-                        ).addOnSuccessListener { cont.resume(true, null) }
-                            .addOnFailureListener { cont.resume(false, null) }
-                    } else cont.resume(true, null)
+    suspend fun createUserIfNotExist(uid: String): User {
+        val userRef = firestore.collection("users").document(uid)
+        val document = userRef.get().await()
 
-                } else cont.resume(false, null)
+        //if user exist then return the db user
+        //else create new user and return it
+        return document.toObject<User>()
+            ?: run {
+                val newUser = User(uid)
+                userRef.set(newUser).await()
+                return@run newUser
             }
     }
 
