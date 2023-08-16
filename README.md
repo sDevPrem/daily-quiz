@@ -1,7 +1,7 @@
 # Daily Quiz
 
-A Quiz App made using firebase. It is based on Unidirectional Data Flow (UDF) Architecture and
-Single-Activity Architecture.
+A Quiz App made using firebase. It is based on Unidirectional Data Flow (UDF) pattern and follows
+MVVM and Single-Activity Architecture.
 
 ## Features
 
@@ -18,10 +18,10 @@ Single-Activity Architecture.
 
 ## Screenshots
 
-|                                                        |                                                       |                                                     |
-|--------------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------|
-| ![welcome_screenshot](image/Screenshot_1685004298.png) | ![signup_screenshot](image/Screenshot_1685004306.png) | ![home_screenshot](image/Screenshot_1685004456.png) |
-| ![quiz_screenshot](image/Screenshot_1685004487.png)    | ![result_screenshot](image/Screenshot_1685004510.png) |                                                     |
+|                                                                                                                     |                                                                                                                    |                                                                                                                  |
+|---------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| ![welcome_screenshot](https://github.com/sDevPrem/daily-quiz/assets/130966261/14ee1203-21aa-40e8-b1af-363f88f5e170) | ![signup_screenshot](https://github.com/sDevPrem/daily-quiz/assets/130966261/6c3d01f5-0518-4d36-9cbf-11c2d7f2105a) | ![home_screenshot](https://github.com/sDevPrem/daily-quiz/assets/130966261/992d6684-d499-4c10-88cf-476feb0fe5c4) |
+| ![quiz_screenshot](https://github.com/sDevPrem/daily-quiz/assets/130966261/beba5c62-647f-4379-9b8e-c7bf8f0ced8e)    | ![result_screenshot](https://github.com/sDevPrem/daily-quiz/assets/130966261/19453e93-707d-485f-bcfa-b7c77d9268a0) |                                                                                                                  |
 
 ## Built With
 
